@@ -108,3 +108,6 @@ RSpec.configure do |config|
   end
 end
 CODE
+
+git add: '.'
+git commit: "-m 'Configure rspec'"
