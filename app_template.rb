@@ -49,3 +49,12 @@ run 'bundle install'
 git :init
 git add: '.'
 git commit: "-m 'Initial commit'"
+
+# ==========================================================
+# Convert the app layout to HAML and set up stylesheet
+# ==========================================================
+
+generate 'haml:application_layout', 'convert'
+run 'git rm app/views/layouts/application.html.erb'
+run 'git rm app/assets/stylesheets/application.css'
+create_file 'app/assets/stylesheets/application.css.scss'
