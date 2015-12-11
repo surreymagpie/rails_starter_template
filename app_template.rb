@@ -58,3 +58,20 @@ generate 'haml:application_layout', 'convert'
 run 'git rm app/views/layouts/application.html.erb'
 run 'git rm app/assets/stylesheets/application.css'
 create_file 'app/assets/stylesheets/application.css.scss'
+
+git add: '.'
+git commit: "-m 'Convert the app layout to HAML and set up stylesheet'"
+
+# ==========================================================
+# Set up test framework
+# ==========================================================
+
+run 'spring binstub --all'
+generate "rspec:install"
+append_file ".rspec", "--format documentation\n"
+run 'spring stop'
+run 'bundle exec guard init rspec'
+gsub_file("Guardfile", 'cmd: "bundle exec rspec"', 'cmd: "bundle exec spring rspec", all_on_start: true')
+
+git add: '.'
+git commit: "-m 'Setup spring, guard and rspec'"
