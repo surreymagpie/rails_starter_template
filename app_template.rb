@@ -67,11 +67,44 @@ git commit: "-m 'Convert the app layout to HAML and set up stylesheet'"
 # ==========================================================
 
 run 'spring binstub --all'
+run 'spring stop'
 generate "rspec:install"
 append_file ".rspec", "--format documentation\n"
-run 'spring stop'
 run 'bundle exec guard init rspec'
 gsub_file("Guardfile", 'cmd: "bundle exec rspec"', 'cmd: "bundle exec spring rspec", all_on_start: true')
 
 git add: '.'
 git commit: "-m 'Setup spring, guard and rspec'"
+
+# ==========================================================
+# Configuration of rspec
+# ==========================================================
+
+# Load capybara into test suite
+insert_into_file 'spec/rails_helper.rb', after: "Rails is not loaded until this point!\n" do <<-CONFIG
+require 'capybara/rails'
+require 'capybara/rspec'
+CONFIG
+end
+
+# Allow use of factories without keep typing 'FactoryGirl'
+insert_into_file 'spec/rails_helper.rb', after: "RSpec.configure do |config|\n" do <<-CONFIG
+  config.include FactoryGirl::Syntax::Methods
+CONFIG
+end
+
+# Clean database on each test run
+file "spec/support/database_cleaner.rb", <<-CODE
+RSpec.configure do |config|
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+end
+CODE
