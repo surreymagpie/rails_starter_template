@@ -15,6 +15,17 @@ say "Setup options: enter 'Y' to accept each", :green
 bootstrap = yes?("Do you wish to use Bootstrap?", :yellow)
 simple_form = yes?("Do you wish to use Simple Form?", :yellow)
 devise = yes?("Do you wish to use Devise?", :yellow)
+
+if devise
+  devise_model = ask("What model should devise use? [User]", :yellow)
+  devise_model ||= 'User' # User as default model
+end
+
+if yes? "Shall I setup a root controller"
+  root_controller = ask("What name should I use? [static_pages]", :yellow)
+  root_controller ||= 'static_pages'
+end
+
 # ==========================================================
 # Set up a Markdown flavoured README ready for Github
 # ==========================================================
@@ -155,4 +166,13 @@ end
 if bootstrap
   append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap';"
   say 'Bootstrap installed', :green
+end
+
+if devise
+  generate 'devise:install'
+  insert_into_file '', after: "Rails.application.configure do\n", "  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }"
+  generate 'devise:views'
+
+  generate "devise #{devise_model}"
+  commit 'Initialize Devise'
 end
