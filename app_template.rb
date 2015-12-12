@@ -18,12 +18,12 @@ devise = yes?("Do you wish to use Devise?", :yellow)
 
 if devise
   devise_model = ask("What model should devise use? [User]", :yellow)
-  devise_model ||= 'User' # User as default model
+  devise_model = devise_model.blank? ? "User" : devise_model # User as default model
 end
 
-if yes? "Shall I setup a root controller"
+if yes? "Shall I setup a root controller", :yellow
   root_controller = ask("What name should I use? [static_pages]", :yellow)
-  root_controller ||= 'static_pages'
+  root_controller = root_controller.blank? ? "static_pages" : root_controller
 end
 
 # ==========================================================
@@ -88,6 +88,8 @@ end
 # ==========================================================
 
 generate 'haml:application_layout', 'convert'
+copy_file 'app/views/layouts/_flash_messages.html.haml'
+insert_into_file 'app/views/layouts/application.html.haml', "    = render 'layouts/flash_messages'", after: "%body\n"
 run 'git rm app/views/layouts/application.html.erb'
 run 'git rm app/assets/stylesheets/application.css'
 create_file 'app/assets/stylesheets/application.css.scss'
@@ -163,6 +165,11 @@ end
 # Install optional components
 # ==========================================================
 
+if root_controller
+  generate(:controller, "#{root_controller} index")
+  route "root '#{root_controller}#index'"
+end
+
 if bootstrap
   append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap';"
   say 'Bootstrap installed', :green
@@ -170,7 +177,10 @@ end
 
 if devise
   generate 'devise:install'
-  insert_into_file '', after: "Rails.application.configure do\n", "  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }"
+  insert_into_file 'config/environments/development.rb', after: "Rails.application.configure do\n" do <<-CONFIG
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  CONFIG
+  end
   generate 'devise:views'
 
   generate "devise #{devise_model}"
