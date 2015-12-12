@@ -97,6 +97,7 @@ end
 file "spec/support/database_cleaner.rb", <<-CODE
 RSpec.configure do |config|
   config.before(:suite) do
+    FactoryGirl.reload
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
   end
@@ -111,3 +112,19 @@ CODE
 
 git add: '.'
 git commit: "-m 'Configure rspec'"
+
+# ==========================================================
+# Turn of annoying generators and turn on rspec
+# ==========================================================
+
+insert_into_file 'config/application.rb', after: "< Rails::Application\n" do <<-CONFIG
+
+    config.generators do |g|
+      g.stylesheets     false
+      g.javascripts     false
+      g.helper          false
+      g.test_framework  :rspec
+    end
+
+CONFIG
+end
