@@ -5,6 +5,12 @@
 #
 # Consider using --skip-keeps, and choosing development
 # database e.g. -d postgresql
+
+def commit(message)
+  git add: '.'
+  git commit: "-m '#{message}'"
+end
+
 say "Setup options: enter 'Y' to accept each", :green
 bootstrap = yes?("Do you wish to use Bootstrap?", :yellow)
 simple_form = yes?("Do you wish to use Simple Form?", :yellow)
@@ -52,8 +58,19 @@ end
 
 run 'bundle install'
 git :init
-git add: '.'
-git commit: "-m 'Initial commit'"
+commit 'Initial commit'
+
+# ==========================================================
+# Install Simple Form
+# ==========================================================
+
+if simple_form
+  cmd = 'simple_form:install'
+  cmd += ' --bootstrap' if bootstrap
+  generate cmd
+  say 'Simple Form installed', :green
+  commit 'Install Simple Form'
+end
 
 # ==========================================================
 # Convert the app layout to HAML and set up stylesheet
@@ -64,8 +81,7 @@ run 'git rm app/views/layouts/application.html.erb'
 run 'git rm app/assets/stylesheets/application.css'
 create_file 'app/assets/stylesheets/application.css.scss'
 
-git add: '.'
-git commit: "-m 'Convert the app layout to HAML and set up stylesheet'"
+commit 'Convert the app layout to HAML and set up stylesheet'
 
 # ==========================================================
 # Set up test framework
@@ -78,8 +94,7 @@ append_file ".rspec", "--format documentation\n"
 run 'bundle exec guard init rspec'
 gsub_file("Guardfile", 'cmd: "bundle exec rspec"', 'cmd: "bundle exec spring rspec", all_on_start: true')
 
-git add: '.'
-git commit: "-m 'Setup spring, guard and rspec'"
+commit 'Setup spring, guard and rspec'
 
 # ==========================================================
 # Configuration of rspec
@@ -115,8 +130,7 @@ RSpec.configure do |config|
 end
 CODE
 
-git add: '.'
-git commit: "-m 'Configure rspec'"
+commit 'Configure rspec'
 
 # ==========================================================
 # Turn of annoying generators and turn on rspec
