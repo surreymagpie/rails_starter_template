@@ -5,7 +5,10 @@
 #
 # Consider using --skip-keeps, and choosing development
 # database e.g. -d postgresql
-
+say "Setup options: enter 'Y' to accept each", :green
+bootstrap = yes?("Do you wish to use Bootstrap?", :yellow)
+simple_form = yes?("Do you wish to use Simple Form?", :yellow)
+devise = yes?("Do you wish to use Devise?", :yellow)
 # ==========================================================
 # Set up a Markdown flavoured README ready for Github
 # ==========================================================
@@ -16,7 +19,9 @@ append_file 'README.md', "# #{app_name.humanize}\n\nTODO..."
 # ==========================================================
 # Set up commonly used gems
 # ==========================================================
-
+gem 'bootstrap-sass' if bootstrap
+gem 'devise' if devise
+gem 'simple_form' if simple_form
 gem 'haml-rails'
 gem 'puma'
 gem 'faker'
@@ -127,4 +132,13 @@ insert_into_file 'config/application.rb', after: "< Rails::Application\n" do <<-
     end
 
 CONFIG
+end
+
+# ==========================================================
+# Install optional components
+# ==========================================================
+
+if bootstrap
+  append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap';"
+  say 'Bootstrap installed', :green
 end
