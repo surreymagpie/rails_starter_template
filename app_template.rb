@@ -1,3 +1,6 @@
+
+source_paths << __FILE__
+
 # This template will step through  commonly repeated
 # steps in the generation of any new rails project
 #
@@ -87,9 +90,12 @@ end
 # Convert the app layout to HAML and set up stylesheet
 # ==========================================================
 
-generate 'haml:application_layout', 'convert'
-copy_file 'app/views/layouts/_flash_messages.html.haml'
-insert_into_file 'app/views/layouts/application.html.haml', "    = render 'layouts/flash_messages'", after: "%body\n"
+copy_file '../app/views/layouts/application.html.haml', 'app/views/layouts/application.html.haml'
+copy_file '../app/views/layouts/_flash_messages.html.haml', 'app/views/layouts/_flash_messages.html.haml'
+
+run 'git rm app/helpers/application_helper.rb'
+copy_file '../app/helpers/application_helper.rb', 'app/helpers/application_helper.rb'
+
 run 'git rm app/views/layouts/application.html.erb'
 run 'git rm app/assets/stylesheets/application.css'
 create_file 'app/assets/stylesheets/application.css.scss'
