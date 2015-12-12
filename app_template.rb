@@ -186,3 +186,13 @@ if devise
   generate "devise #{devise_model}"
   commit 'Initialize Devise'
 end
+
+# ==========================================================
+# Finally, set up the database
+# ==========================================================
+
+rake 'db:drop' #in case the same app_name has been used on postgres
+rake 'db:create'
+rake 'db:migrate'
+
+commit 'Set up database'
