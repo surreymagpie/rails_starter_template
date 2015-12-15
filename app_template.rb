@@ -180,7 +180,7 @@ if root_controller
 end
 
 if bootstrap
-  append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap-sprockets';"
+  append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap-sprockets';\n"
   append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap';"
   say 'Bootstrap installed', :green
 end
