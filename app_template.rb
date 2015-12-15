@@ -167,6 +167,9 @@ insert_into_file 'config/application.rb', after: "< Rails::Application\n" do <<-
 CONFIG
 end
 
+generate 'annotate:install'
+
+commit 'Switch off some generators'
 # ==========================================================
 # Install optional components
 # ==========================================================
