@@ -49,7 +49,6 @@ gem 'faker'
 unless bootstrap
   gem 'bourbon'
   gem 'neat'
-  gem 'bitters'
   gem 'refills'
 end
 
@@ -193,11 +192,27 @@ if root_controller
   route "root '#{root_controller}#index'"
 end
 
+commit 'Generate root controller'
+
 if bootstrap
   append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap-sprockets';\n"
   append_file 'app/assets/stylesheets/application.css.scss', "@import 'bootstrap';"
   say 'Bootstrap installed', :green
+else
+  append_file 'app/assets/stylesheets/application.css.scss', "@import 'bourbon';\n"
+  append_file 'app/assets/stylesheets/application.css.scss', "@import 'base/base';\n"
+  append_file 'app/assets/stylesheets/application.css.scss', "@import 'neat';\n"
+
+  unless system 'gem which bitters'
+    puts 'Bitters is not installed'
+    system 'gem install bitters'
+  end
+
+  system 'bitters install --path app/assets/stylesheets'
+  say 'Bourbon and bitters installed', :green
 end
+
+commit 'Base stylesheet rules'
 
 if devise
   generate 'devise:install'
