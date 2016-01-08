@@ -18,6 +18,7 @@ say "Setup options: enter 'Y' to accept each", :green
 bootstrap = yes?("Do you wish to use Bootstrap?", :yellow)
 simple_form = yes?("Do you wish to use Simple Form?", :yellow)
 devise = yes?("Do you wish to use Devise?", :yellow)
+haml = yes?("Do you wish to use Haml?", :yellow)
 
 if devise
   devise_model = ask("What model should devise use? [User]", :yellow)
@@ -42,9 +43,15 @@ append_file 'README.md', "# #{app_name.humanize}\n\nTODO..."
 gem 'bootstrap-sass' if bootstrap
 gem 'devise' if devise
 gem 'simple_form' if simple_form
-gem 'haml-rails'
+gem 'haml-rails' if haml
 gem 'puma'
 gem 'faker'
+unless bootstrap
+  gem 'bourbon'
+  gem 'neat'
+  gem 'bitters'
+  gem 'refills'
+end
 
 gem_group :production do
   gem 'rails_12factor'
@@ -58,15 +65,15 @@ gem_group :development do
 end
 
 gem_group :development, :test do
-  gem 'guard-rspec', require: false
-  gem 'rb-inotify', require: false
-  gem 'rspec-rails', require: false
+  gem 'factory_girl_rails'
+  gem 'guard-rspec'
+  gem 'rb-inotify'
+  gem 'rspec-rails'
 end
 
 gem_group :test do
   gem 'capybara'
   gem 'database_cleaner'
-  gem 'factory_girl_rails'
   gem 'spring-commands-rspec'
 end
 
@@ -87,11 +94,8 @@ if simple_form
 end
 
 # ==========================================================
-# Convert the app layout to HAML and set up stylesheet
+# Set up the base layout and stylesheet
 # ==========================================================
-
-copy_file '../app/views/layouts/application.html.haml', 'app/views/layouts/application.html.haml'
-copy_file '../app/views/layouts/_flash_messages.html.haml', 'app/views/layouts/_flash_messages.html.haml'
 
 run 'git rm app/helpers/application_helper.rb'
 copy_file '../app/helpers/application_helper.rb', 'app/helpers/application_helper.rb'
@@ -100,7 +104,15 @@ run 'git rm app/views/layouts/application.html.erb'
 run 'git rm app/assets/stylesheets/application.css'
 create_file 'app/assets/stylesheets/application.css.scss'
 
-commit 'Convert the app layout to HAML and set up stylesheet'
+if haml
+  copy_file '../app/views/layouts/application.html.haml', 'app/views/layouts/application.html.haml'
+  copy_file '../app/views/layouts/_flash_messages.html.haml', 'app/views/layouts/_flash_messages.html.haml'
+else
+  copy_file '../app/views/layouts/application.html.erb', 'app/views/layouts/application.html.erb'
+  copy_file '../app/views/layouts/_flash_messages.html.erb', 'app/views/layouts/_flash_messages.html.erb'
+end
+
+commit 'Set up the base layout and stlesheet'
 
 # ==========================================================
 # Set up test framework
@@ -160,6 +172,8 @@ insert_into_file 'config/application.rb', after: "< Rails::Application\n" do <<-
     config.generators do |g|
       g.stylesheets     false
       g.javascripts     false
+      g.view_specs      false
+      g.routing_specs   false
       g.helper          false
       g.test_framework  :rspec
     end
