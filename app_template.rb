@@ -1,4 +1,11 @@
+# ==========================================================
+# Fix current ruby version in Gemfile and .ruby-version
+# ==========================================================
 
+ruby_version = `rbenv global`
+say "Ruby version is #{ruby_version}"
+create_file ".ruby-version", ruby_version
+prepend_file "Gemfile", "ruby '#{ruby_version.strip}'\n"
 source_paths << __FILE__
 
 # This template will step through  commonly repeated
